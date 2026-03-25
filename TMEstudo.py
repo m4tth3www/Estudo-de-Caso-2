@@ -59,7 +59,7 @@ fig_pie = px.pie(
     freq_df,
     names='horas',
     values='freq',
-    title='Distribuição Geral das Respostas'
+    title='Distribuição Geral'
 )
 
 
@@ -67,7 +67,7 @@ fig_pie = px.pie(
 # APP DASH
 # ======================
 app = Dash(__name__)
-app.title = "Pesquisa de Estudo"
+app.title = "Estudo de Caso"
 
 CARD_STYLE = {
     "background": "#f6f8fb",
