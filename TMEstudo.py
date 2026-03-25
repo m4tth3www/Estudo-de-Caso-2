@@ -51,7 +51,16 @@ fig_bar = px.bar(
     x=x_labels,
     y=freq_df['freq'],
     title='Horas Estudadas vs Quantidade',
-    labels={'x': 'Horas Estudadas', 'y': 'Quantidade'}
+    labels={'x': 'Horas Estudadas', 'y': 'Quantidade'},
+    color_discrete_sequence=['#3498db']
+)
+fig_bar.update_layout(
+    plot_bgcolor='rgba(240, 245, 250, 0.5)',
+    paper_bgcolor='white',
+    font=dict(family="Arial, sans-serif", size=12, color="#2c3e50"),
+    title_font_size=18,
+    showlegend=False,
+    hovermode='x unified'
 )
 
 # 🔹 Gráfico de pizza
@@ -59,7 +68,13 @@ fig_pie = px.pie(
     freq_df,
     names='horas',
     values='freq',
-    title='Distribuição Geral'
+    title='Distribuição Geral',
+    color_discrete_sequence=['#3498db', '#e74c3c', '#f39c12', '#2ecc71']
+)
+fig_pie.update_layout(
+    paper_bgcolor='white',
+    font=dict(family="Arial, sans-serif", size=12, color="#2c3e50"),
+    title_font_size=18
 )
 
 
@@ -67,58 +82,215 @@ fig_pie = px.pie(
 # APP DASH
 # ======================
 app = Dash(__name__)
-app.title = "Estudo de Caso"
+app.title = "Estudo de Caso 2 - Análise de Dados"
 
-CARD_STYLE = {
-    "background": "#f6f8fb",
-    "padding": "14px",
-    "border-radius": "8px",
-    "box-shadow": "0 2px 6px rgba(0,0,0,0.06)",
+# Estilos das cartas de estatísticas
+CARD_STYLE_BASE = {
+    "padding": "24px",
+    "border-radius": "12px",
+    "box-shadow": "0 4px 15px rgba(0, 0, 0, 0.1)",
     "text-align": "center",
+    "flex": "1",
+    "transition": "all 0.3s ease",
+    "border": "none",
 }
 
+CARD_MEDIA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"}
+CARD_MEDIANA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"}
+CARD_MODA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"}
+
+# CSS externo para melhor styling
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                background-color: #f8f9fa;
+                font-family: 'Segoe UI', 'Arial', sans-serif;
+                color: #2c3e50;
+            }
+            
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 40px 20px;
+                text-align: center;
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            }
+            
+            .header h1 {
+                font-size: 2.5em;
+                margin-bottom: 8px;
+                font-weight: 700;
+                letter-spacing: -0.5px;
+            }
+            
+            .header p {
+                font-size: 1.1em;
+                opacity: 0.95;
+                font-weight: 300;
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 40px 20px;
+            }
+            
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin-bottom: 40px;
+            }
+            
+            .stat-card {
+                padding: 24px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                color: white;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            
+            .stat-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
+            
+            .stat-card-media {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            
+            .stat-card-mediana {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            }
+            
+            .stat-card-moda {
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            }
+            
+            .stat-label {
+                font-size: 0.95em;
+                opacity: 0.9;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 12px;
+            }
+            
+            .stat-value {
+                font-size: 2.5em;
+                font-weight: 700;
+                letter-spacing: -1px;
+            }
+            
+            .charts-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                gap: 24px;
+                margin-bottom: 40px;
+            }
+            
+            .chart-card {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+                overflow: hidden;
+                transition: box-shadow 0.3s ease;
+            }
+            
+            .chart-card:hover {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            }
+            
+            .dash-graph {
+                padding: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
 app.layout = html.Div(
-    style={"font-family": "Segoe UI, Arial", "margin": "18px"},
     children=[
-
-        html.H2("Análise da Pesquisa de Estudo"),
-
-        html.P(
-            "Pergunta: Quantas horas por semana você estuda fora da sala?",
-            style={"color": "#555"}
-        ),
-
-        # Estatísticas
+        # Header
         html.Div(
-            style={"display": "flex", "gap": "12px", "margin-bottom": "18px"},
+            className="header",
             children=[
-
-                html.Div(style=CARD_STYLE, children=[
-                    html.Div("Média"),
-                    html.H3(f"{media:.2f} h")
-                ]),
-
-                html.Div(style=CARD_STYLE, children=[
-                    html.Div("Mediana"),
-                    html.H3(f"{mediana} h")
-                ]),
-
-                html.Div(style=CARD_STYLE, children=[
-                    html.Div("Moda"),
-                    html.H3(f"{moda} h")
-                ]),
-            ],
+                html.H1("📊 Análise de Horas de Estudo"),
+                html.P("Pesquisa: Quantas horas por semana você estuda fora da sala?")
+            ]
         ),
-
-        # Gráficos: barras + setores
+        
+        # Container principal
         html.Div(
-            style={"display": "grid", "grid-template-columns": "1fr 1fr", "gap": "12px", "margin-bottom": "18px"},
+            className="container",
             children=[
-                dcc.Graph(figure=fig_bar),
-                dcc.Graph(figure=fig_pie),
-            ],
-        ),
-    ],
+                # Cards de Estatísticas
+                html.Div(
+                    className="stats-grid",
+                    children=[
+                        html.Div(
+                            className="stat-card stat-card-media",
+                            children=[
+                                html.Div(className="stat-label", children="Média"),
+                                html.Div(className="stat-value", children=f"{media:.2f} h")
+                            ]
+                        ),
+                        html.Div(
+                            className="stat-card stat-card-mediana",
+                            children=[
+                                html.Div(className="stat-label", children="Mediana"),
+                                html.Div(className="stat-value", children=f"{mediana} h")
+                            ]
+                        ),
+                        html.Div(
+                            className="stat-card stat-card-moda",
+                            children=[
+                                html.Div(className="stat-label", children="Moda"),
+                                html.Div(className="stat-value", children=f"{moda} h")
+                            ]
+                        ),
+                    ]
+                ),
+                
+                # Gráficos
+                html.Div(
+                    className="charts-container",
+                    children=[
+                        html.Div(
+                            className="chart-card",
+                            children=[dcc.Graph(figure=fig_bar)]
+                        ),
+                        html.Div(
+                            className="chart-card",
+                            children=[dcc.Graph(figure=fig_pie)]
+                        ),
+                    ]
+                ),
+            ]
+        )
+    ]
 )
 
 # ======================
