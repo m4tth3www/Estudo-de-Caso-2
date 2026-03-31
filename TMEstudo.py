@@ -228,7 +228,10 @@ app.layout = html.Div(
             className="header",
             children=[
                 html.H1("📊 Análise de Horas de Estudo"),
-                html.P("Pesquisa: Quantas horas por semana você estuda fora da sala?")
+                html.H2("Pesquisa: Quantas horas por semana você estuda fora da sala?"),
+                html.Strong("Professor: Francisco de Assis Souza de Oliveira"),
+                html.P("Aluno: Emanuel Santos"),
+                html.P("Aluno: Matheus Rebelo"),
             ]
         ),
         
