@@ -35,6 +35,7 @@ moda = statistics.mode(dados)
 
 
 x_labels = ['1 h', '2 h', '4 h', '7 h']
+
 fig_bar = px.bar(
     x=x_labels,
     y=freq_df['freq'],
