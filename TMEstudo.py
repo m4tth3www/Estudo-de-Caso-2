@@ -1,9 +1,7 @@
 import sys
 import subprocess
 
-# ======================
-# INSTALAR DEPENDÊNCIAS
-# ======================
+
 def ensure(packages):
     import importlib
     for pkg in packages:
@@ -14,9 +12,7 @@ def ensure(packages):
 
 ensure(["dash", "plotly", "pandas"])
 
-# ======================
-# IMPORTS
-# ======================
+
 import statistics
 import pandas as pd
 from dash import Dash, html, dcc
@@ -24,28 +20,20 @@ import plotly.express as px
 import plotly.graph_objects as go
 import webbrowser
 
-# ======================
-# DADOS DA PESQUISA
-# ======================
+
 dados = [1]*5 + [2]*6 + [4]*3 + [7]*3
 df = pd.DataFrame({"horas": dados})
 
-# Frequência
+
 freq_df = df["horas"].value_counts().sort_index().reset_index()
 freq_df.columns = ["horas", "freq"]
 
-# ======================
-# ESTATÍSTICAS
-# ======================
+
 media = statistics.mean(dados)
 mediana = statistics.median(dados)
 moda = statistics.mode(dados)
 
-# ======================
-# GRÁFICOS
-# ======================
 
-# 🔹 Gráfico de barras simples: horas estudadas x quantidade
 x_labels = ['1 h', '2 h', '4 h', '7 h']
 fig_bar = px.bar(
     x=x_labels,
@@ -63,7 +51,7 @@ fig_bar.update_layout(
     hovermode='x unified'
 )
 
-# 🔹 Gráfico de pizza
+
 fig_pie = px.pie(
     freq_df,
     names='horas',
@@ -78,13 +66,11 @@ fig_pie.update_layout(
 )
 
 
-# ======================
-# APP DASH
-# ======================
+
 app = Dash(__name__)
 app.title = "Estudo de Caso 2 - Análise de Dados"
 
-# Estilos das cartas de estatísticas
+
 CARD_STYLE_BASE = {
     "padding": "24px",
     "border-radius": "12px",
@@ -99,7 +85,7 @@ CARD_MEDIA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #667eea 
 CARD_MEDIANA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"}
 CARD_MODA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"}
 
-# CSS externo para melhor styling
+
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -242,11 +228,11 @@ app.layout = html.Div(
             ]
         ),
         
-        # Container principal
+        
         html.Div(
             className="container",
             children=[
-                # Cards de Estatísticas
+               
                 html.Div(
                     className="stats-grid",
                     children=[
@@ -274,7 +260,7 @@ app.layout = html.Div(
                     ]
                 ),
                 
-                # Gráficos
+               
                 html.Div(
                     className="charts-container",
                     children=[
@@ -293,9 +279,7 @@ app.layout = html.Div(
     ]
 )
 
-# ======================
-# EXECUÇÃO
-# ======================
+
 if __name__ == "__main__":
     webbrowser.open("http://127.0.0.1:8050/")
     app.run(debug=True)
