@@ -50,7 +50,7 @@ x_labels = ['1 h', '2 h', '4 h', '7 h']
 fig_bar = px.bar(
     x=x_labels,
     y=freq_df['freq'],
-    title='Horas Estudadas vs Quantidade',
+    title='HORAS ESTUDADAS VS QUANTIDADE',
     labels={'x': 'Horas Estudadas', 'y': 'Quantidade'},
     color_discrete_sequence=['#3498db']
 )
@@ -68,7 +68,7 @@ fig_pie = px.pie(
     freq_df,
     names='horas',
     values='freq',
-    title='Distribuição Geral',
+    title='DISTRIBUIÇÃO GERAL DAS HORAS ESTUDADAS',
     color_discrete_sequence=['#3498db', '#e74c3c', '#f39c12', '#2ecc71']
 )
 fig_pie.update_layout(
@@ -238,7 +238,11 @@ app.layout = html.Div(
             className="header",
             children=[
                 html.H1("📊 Análise de Horas de Estudo"),
-                html.P("Pesquisa: Quantas horas por semana você estuda fora da sala?")
+                html.H2("Quantas horas por semana você estuda fora da sala?"),
+                html.Strong("Professor: Francisco Sôusa"),
+                html.P("Alunos: Emanuel Santos da Silva"),
+                html.P("Alunos: Matheus Rabelo")
+            
             ]
         ),
         
