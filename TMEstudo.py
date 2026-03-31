@@ -1,9 +1,7 @@
 import sys
 import subprocess
 
-# ======================
-# INSTALAR DEPENDÊNCIAS
-# ======================
+
 def ensure(packages):
     import importlib
     for pkg in packages:
@@ -14,39 +12,30 @@ def ensure(packages):
 
 ensure(["dash", "plotly", "pandas"])
 
-# ======================
-# IMPORTS
-# ======================
+
 import statistics
 import pandas as pd
-from dash import Dash, html, dcc
+from dash import Dash, html, dcc, Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
 import webbrowser
 
-# ======================
-# DADOS DA PESQUISA
-# ======================
+
 dados = [1]*5 + [2]*6 + [4]*3 + [7]*3
 df = pd.DataFrame({"horas": dados})
 
-# Frequência
+
 freq_df = df["horas"].value_counts().sort_index().reset_index()
 freq_df.columns = ["horas", "freq"]
 
-# ======================
-# ESTATÍSTICAS
-# ======================
+
 media = statistics.mean(dados)
 mediana = statistics.median(dados)
 moda = statistics.mode(dados)
 
-# ======================
-# GRÁFICOS
-# ======================
 
-# 🔹 Gráfico de barras simples: horas estudadas x quantidade
 x_labels = ['1 h', '2 h', '4 h', '7 h']
+
 fig_bar = px.bar(
     x=x_labels,
     y=freq_df['freq'],
@@ -60,10 +49,11 @@ fig_bar.update_layout(
     font=dict(family="Arial, sans-serif", size=12, color="#2c3e50"),
     title_font_size=18,
     showlegend=False,
-    hovermode='x unified'
+    hovermode='x unified',
+    clickmode='select'
 )
 
-# 🔹 Gráfico de pizza
+
 fig_pie = px.pie(
     freq_df,
     names='horas',
@@ -74,17 +64,16 @@ fig_pie = px.pie(
 fig_pie.update_layout(
     paper_bgcolor='white',
     font=dict(family="Arial, sans-serif", size=12, color="#2c3e50"),
-    title_font_size=18
+    title_font_size=18,
+    clickmode='select'
 )
 
 
-# ======================
-# APP DASH
-# ======================
+
 app = Dash(__name__)
 app.title = "Estudo de Caso 2 - Análise de Dados"
 
-# Estilos das cartas de estatísticas
+
 CARD_STYLE_BASE = {
     "padding": "24px",
     "border-radius": "12px",
@@ -99,7 +88,7 @@ CARD_MEDIA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #667eea 
 CARD_MEDIANA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"}
 CARD_MODA = {**CARD_STYLE_BASE, "background": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"}
 
-# CSS externo para melhor styling
+
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -208,15 +197,16 @@ app.index_string = '''
                 border-radius: 12px;
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
                 overflow: hidden;
-                transition: box-shadow 0.3s ease;
-            }
-            
-            .chart-card:hover {
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
             }
             
             .dash-graph {
                 padding: 20px;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            
+            .dash-graph:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             }
         </style>
     </head>
@@ -238,19 +228,15 @@ app.layout = html.Div(
             className="header",
             children=[
                 html.H1("📊 Análise de Horas de Estudo"),
-                html.H2("Quantas horas por semana você estuda fora da sala?"),
-                html.Strong("Professor: Francisco Sôusa"),
-                html.P("Alunos: Emanuel Santos da Silva"),
-                html.P("Alunos: Matheus Rabelo")
-            
+                html.P("Pesquisa: Quantas horas por semana você estuda fora da sala?")
             ]
         ),
         
-        # Container principal
+        
         html.Div(
             className="container",
             children=[
-                # Cards de Estatísticas
+               
                 html.Div(
                     className="stats-grid",
                     children=[
@@ -278,17 +264,17 @@ app.layout = html.Div(
                     ]
                 ),
                 
-                # Gráficos
+               
                 html.Div(
                     className="charts-container",
                     children=[
                         html.Div(
                             className="chart-card",
-                            children=[dcc.Graph(figure=fig_bar)]
+                            children=[dcc.Graph(id='bar-chart', figure=fig_bar)]
                         ),
                         html.Div(
                             className="chart-card",
-                            children=[dcc.Graph(figure=fig_pie)]
+                            children=[dcc.Graph(id='pie-chart', figure=fig_pie)]
                         ),
                     ]
                 ),
@@ -297,9 +283,67 @@ app.layout = html.Div(
     ]
 )
 
-# ======================
-# EXECUÇÃO
-# ======================
+
+@app.callback(
+    Output('pie-chart', 'figure'),
+    Input('bar-chart', 'selectedData')
+)
+def update_pie(selectedData):
+    if selectedData and 'points' in selectedData and selectedData['points']:
+        selected_labels = [point['x'] for point in selectedData['points']]
+        hour_map = {'1 h': 1, '2 h': 2, '4 h': 4, '7 h': 7}
+        selected_nums = [hour_map[label] for label in selected_labels if label in hour_map]
+        filtered_df = freq_df[freq_df['horas'].isin(selected_nums)]
+    else:
+        filtered_df = freq_df
+    
+    fig_pie = px.pie(
+        filtered_df,
+        names='horas',
+        values='freq',
+        title='Distribuição Geral',
+        color_discrete_sequence=['#3498db', '#e74c3c', '#f39c12', '#2ecc71']
+    )
+    fig_pie.update_layout(
+        paper_bgcolor='white',
+        font=dict(family="Arial, sans-serif", size=12, color="#2c3e50"),
+        title_font_size=18,
+        clickmode='select'
+    )
+    return fig_pie
+
+
+@app.callback(
+    Output('bar-chart', 'figure'),
+    Input('pie-chart', 'selectedData')
+)
+def update_bar(selectedData):
+    if selectedData and 'points' in selectedData and selectedData['points']:
+        selected_hours = [int(point['label']) for point in selectedData['points']]
+        filtered_df = freq_df[freq_df['horas'].isin(selected_hours)]
+    else:
+        filtered_df = freq_df
+    
+    x_labels = [f"{h} h" for h in filtered_df['horas']]
+    fig_bar = px.bar(
+        x=x_labels,
+        y=filtered_df['freq'],
+        title='Horas Estudadas vs Quantidade',
+        labels={'x': 'Horas Estudadas', 'y': 'Quantidade'},
+        color_discrete_sequence=['#3498db']
+    )
+    fig_bar.update_layout(
+        plot_bgcolor='rgba(240, 245, 250, 0.5)',
+        paper_bgcolor='white',
+        font=dict(family="Arial, sans-serif", size=12, color="#2c3e50"),
+        title_font_size=18,
+        showlegend=False,
+        hovermode='x unified',
+        clickmode='select'
+    )
+    return fig_bar
+
+
 if __name__ == "__main__":
     webbrowser.open("http://127.0.0.1:8050/")
     app.run(debug=True)
