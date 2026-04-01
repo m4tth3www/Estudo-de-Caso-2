@@ -331,7 +331,7 @@ def update_bar(selectedData):
     fig_bar = px.bar(
         x=x_labels,
         y=filtered_df['freq'],
-        title='Horas Estudadas vs Quantidade',
+        title=' HORAS ESTUDADAS VS QUANTIDADE',
         labels={'x': 'Horas Estudadas', 'y': 'Quantidade'},
         color_discrete_sequence=['#3498db']
     )
